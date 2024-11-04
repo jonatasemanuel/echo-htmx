@@ -1,0 +1,10 @@
+package views
+
+templ Home(title string) {
+	@Layout(title) {
+		<button hx-post="/clickd" hx-trigger="click" hx-target="#parent-div" hx-swap="outerHTML">
+			Click Me!
+		</button>
+		<h1>Welcome back!</h1>
+	}
+}
