@@ -33,7 +33,7 @@ func postHandler(c echo.Context) error {
 	if c.FormValue("global") != "" {
 		global.Count++
 	}
-	if c.FormValue("user") != "" {
+	if c.FormValue("session") != "" {
 		currentCount := sessionManager.GetInt(c.Request().Context(), "count")
 		sessionManager.Put(c.Request().Context(), "count", currentCount+1)
 	}
