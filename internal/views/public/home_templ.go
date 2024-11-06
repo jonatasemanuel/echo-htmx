@@ -41,7 +41,7 @@ func Home(title string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button hx-post=\"/clickd\" hx-trigger=\"click\" hx-target=\"#parent-div\" hx-swap=\"outerHTML\">Click Me!</button><h1>Welcome back!</h1>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Welcome back!</h1>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
