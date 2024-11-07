@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/a-h/templ"
@@ -10,23 +11,19 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-/*
-func homeHandler(c echo.Context) error {
-	return render(c, views.Home("joey"))
+type ScoreState struct {
+	Count int
 }
-func timeHandler(c echo.Context) error {
-	return render(c, views.TimeComponent(time.Now()))
-} */
-
 type GlobalState struct {
 	Count int
 }
 type Quest struct {
 	Char   string
-	Animes [4]string
+	Animes []string
 }
 
 var global GlobalState
+var total ScoreState
 var sessionManager *scs.SessionManager
 
 func getHandler(c echo.Context) error {
@@ -47,12 +44,19 @@ func postHandler(c echo.Context) error {
 }
 
 func getHome(c echo.Context) error {
+	// get from some repo(api) or create a api(pkg) fetching by another
 	quest := Quest{
 		Char:   "Ace",
-		Animes: [4]string{"One Piece", "Naruto", "Bleach", "X-men"},
+		Animes: []string{"One Piece", "Naruto", "Bleach", "X-men"},
 	}
-
-	return render(c, views.Home("guess the anime", quest.Char, quest.Animes))
+	component := views.Home(strconv.Itoa(total.Count), quest.Char, quest.Animes)
+	return render(c, component)
+}
+func postHomeHandler(c echo.Context) error {
+	if c.FormValue("total") != "" {
+		total.Count++
+	}
+	return getHome(c)
 }
 
 func render(ctx echo.Context, cmp templ.Component) error {
@@ -61,13 +65,16 @@ func render(ctx echo.Context, cmp templ.Component) error {
 
 func main() {
 	e := echo.New()
+	sessionManager = scs.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
 	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
 
 	e.GET("/", getHome)
+	e.POST("/", postHomeHandler)
+
+	// --counter
 	e.GET("/count", getHandler)
 	e.POST("/count", postHandler)
 	e.Logger.Fatal(e.Start(":8080"))
