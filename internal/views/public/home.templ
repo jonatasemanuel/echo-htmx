@@ -1,7 +1,12 @@
 package views
 
-templ Home(title string) {
-@Layout(title) {
-<h1>Welcome back!</h1>
-}
+templ Home(title string, char string, animes [4]string) {
+	<div hx-get="/" hx-trigger="click">
+		{ char }
+		<ul>
+			for _, anime := range animes {
+				<button>{ anime }</button>
+			}
+		</ul>
+	</div>
 }

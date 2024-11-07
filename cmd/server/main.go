@@ -7,9 +7,11 @@ import (
 	"github.com/alexedwards/scs/v2"
 	views "github.com/jonatasemanuel/echo-htmx/internal/views/public"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
-/* func homeHandler(c echo.Context) error {
+/*
+func homeHandler(c echo.Context) error {
 	return render(c, views.Home("joey"))
 }
 func timeHandler(c echo.Context) error {
@@ -18,6 +20,10 @@ func timeHandler(c echo.Context) error {
 
 type GlobalState struct {
 	Count int
+}
+type Quest struct {
+	Char   string
+	Animes [4]string
 }
 
 var global GlobalState
@@ -40,18 +46,30 @@ func postHandler(c echo.Context) error {
 	return getHandler(c)
 }
 
+func getHome(c echo.Context) error {
+	quest := Quest{
+		Char:   "Ace",
+		Animes: [4]string{"One Piece", "Naruto", "Bleach", "X-men"},
+	}
+
+	return render(c, views.Home("guess the anime", quest.Char, quest.Animes))
+}
+
 func render(ctx echo.Context, cmp templ.Component) error {
 	return cmp.Render(ctx.Request().Context(), ctx.Response())
 }
 
 func main() {
 	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 	sessionManager = scs.New()
 	sessionManager.Lifetime = 24 * time.Hour
 	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
 
-	e.GET("/", getHandler)
-	e.POST("/", postHandler)
+	e.GET("/", getHome)
+	e.GET("/count", getHandler)
+	e.POST("/count", postHandler)
 	e.Logger.Fatal(e.Start(":8080"))
 
 }

@@ -2,12 +2,8 @@ package views
 
 import "strconv"
 
-//templ Counts(global, user int) {
-// <div>Global: { strconv.Itoa(global) }</div>
-// <div>USer: { strconv.Itoa(user) }</div>
-//}
 templ Counts(global, session int) {
-	<form id="countsForm" action="/" method="POST" hx-post="/" hx-select="#countsForm" hx-swap="outerHTML">
+	<form id="countsForm" action="/count" method="POST" hx-post="/count" hx-select="#countsForm" hx-swap="outerHTML">
 		<div class="columns">
 			<div class="column has-text-centered border">
 				<h1 class="title is-size-1 has-text-centered">{ strconv.Itoa(global) }</h1>
