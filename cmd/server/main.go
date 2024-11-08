@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -59,9 +61,20 @@ func postHomeHandler(c echo.Context) error {
 	if c.FormValue("total") != "" {
 		total.Count++
 	}
-	start += 4
-	end += 4
-	char++
+	if end < len(FetchQuestData().Animes) {
+		start += 4
+		end += 4
+		char++
+	}
+	if end > len(FetchQuestData().Animes) {
+		// stop and show final resual
+		start = 0
+		end = 4
+		char = 0
+		c.Response().Header().Set("HX-Redirect", "/count")
+		return c.NoContent(http.StatusNoContent)
+
+	}
 	return getHome(c)
 }
 

@@ -17,6 +17,9 @@ templ Quest(total, char string, animes []string) {
 		{{ sorted := animes[:] }}
 		{{ sort.Strings(sorted) }}
 		@Score(total, char)
+		<div>
+			<h1>{ char } </h1>
+		</div>
 		<ul>
 			for _, anime := range sorted {
 			if anime == res {
@@ -34,11 +37,8 @@ templ Quest(total, char string, animes []string) {
 </form>
 }
 
-templ Score(total, char string) {
+templ Score(total int) {
 <div>
 	<h2>Score:{ total } </h2>
-</div>
-<div>
-	<h1>{ char } </h1>
 </div>
 }
