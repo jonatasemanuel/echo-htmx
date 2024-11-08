@@ -11,23 +11,22 @@ templ Home(total, char string, animes []string) {
 }
 
 templ Quest(total, char string, animes []string) {
-<!-- option choices -->
 <form id="totalCount" action="/" method="POST" hx-post="/" hx-select="#totalCount" hx-swap="outerHTML">
 	<div>
+		{{ res := animes[0] }}
 		{{ sorted := animes[:] }}
 		{{ sort.Strings(sorted) }}
 		@Score(total, char)
 		<ul>
-			for i, anime := range sorted {
-			// harded code, result must be in the handler?
-			// or its just to give a visual response on button
-			// switch case to points account
-			if anime == animes[0] {
+			for _, anime := range sorted {
+			if anime == res {
 			<button class="button is-primary" type="submit" name="total" value="total">
 				{ anime }
 			</button>
 			} else {
-			<button>{ anime }</button>
+			<button class="button is-primary" type="submit">
+				{ anime }
+			</button>
 			}
 			}
 		</ul>
@@ -37,11 +36,9 @@ templ Quest(total, char string, animes []string) {
 
 templ Score(total, char string) {
 <div>
-	<div>
-		<h2>Score:{ total } </h2>
-	</div>
-	<div>
-		<h1>{ char } </h1>
-	</div>
+	<h2>Score:{ total } </h2>
+</div>
+<div>
+	<h1>{ char } </h1>
 </div>
 }

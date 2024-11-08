@@ -18,10 +18,15 @@ type GlobalState struct {
 	Count int
 }
 type Quest struct {
-	Char   string
+	Chars  []string
 	Animes []string
 }
 
+var (
+	char  int = 0
+	start int = 0
+	end   int = 4
+)
 var global GlobalState
 var total ScoreState
 var sessionManager *scs.SessionManager
@@ -45,17 +50,18 @@ func postHandler(c echo.Context) error {
 
 func getHome(c echo.Context) error {
 	// get from some repo(api) or create a api(pkg) fetching by another
-	quest := Quest{
-		Char:   "Ace",
-		Animes: []string{"One Piece", "Naruto", "Bleach", "X-men"},
-	}
-	component := views.Home(strconv.Itoa(total.Count), quest.Char, quest.Animes)
+	slice := FetchQuestData().Animes[start:end]
+	component := views.Home(strconv.Itoa(total.Count), FetchQuestData().Chars[char], slice)
 	return render(c, component)
 }
+
 func postHomeHandler(c echo.Context) error {
 	if c.FormValue("total") != "" {
 		total.Count++
 	}
+	start += 4
+	end += 4
+	char++
 	return getHome(c)
 }
 
