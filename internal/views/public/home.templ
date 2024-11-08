@@ -4,41 +4,46 @@ import "sort"
 
 var sorted []string
 
-templ Home(total, char string, animes []string) {
-@Layout("guesswho") {
-@Quest(total, char, animes)
-}
+templ Home(total, char string, animes []string, done int) {
+	@Layout("guesswho") {
+		if done > 0 {
+			@Quest(total, char, animes)
+		} else {
+			<h1>U shit: </h1>
+			@Score(total)
+		}
+	}
 }
 
 templ Quest(total, char string, animes []string) {
-<form id="totalCount" action="/" method="POST" hx-post="/" hx-select="#totalCount" hx-swap="outerHTML">
-	<div>
-		{{ res := animes[0] }}
-		{{ sorted := animes[:] }}
-		{{ sort.Strings(sorted) }}
-		@Score(total, char)
+	<form id="totalCount" action="/" method="POST" hx-post="/" hx-select="#totalCount" hx-swap="outerHTML">
 		<div>
-			<h1>{ char } </h1>
+			{{ res := animes[0] }}
+			{{ sorted := animes[:] }}
+			{{ sort.Strings(sorted) }}
+			@Score(total)
+			<div>
+				<h1>{ char } </h1>
+			</div>
+			<ul>
+				for _, anime := range sorted {
+					if anime == res {
+						<button class="button is-primary" type="submit" name="total" value="total">
+							{ anime }
+						</button>
+					} else {
+						<button class="button is-primary" type="submit">
+							{ anime }
+						</button>
+					}
+				}
+			</ul>
 		</div>
-		<ul>
-			for _, anime := range sorted {
-			if anime == res {
-			<button class="button is-primary" type="submit" name="total" value="total">
-				{ anime }
-			</button>
-			} else {
-			<button class="button is-primary" type="submit">
-				{ anime }
-			</button>
-			}
-			}
-		</ul>
-	</div>
-</form>
+	</form>
 }
 
-templ Score(total int) {
-<div>
-	<h2>Score:{ total } </h2>
-</div>
+templ Score(total string) {
+	<div>
+		<h2>Score:{ total } </h2>
+	</div>
 }

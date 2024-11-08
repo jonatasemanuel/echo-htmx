@@ -28,6 +28,7 @@ var (
 	char  int = 0
 	start int = 0
 	end   int = 4
+	done  int = 15
 )
 var global GlobalState
 var total ScoreState
@@ -53,7 +54,7 @@ func postHandler(c echo.Context) error {
 func getHome(c echo.Context) error {
 	// get from some repo(api) or create a api(pkg) fetching by another
 	slice := FetchQuestData().Animes[start:end]
-	component := views.Home(strconv.Itoa(total.Count), FetchQuestData().Chars[char], slice)
+	component := views.Home(strconv.Itoa(total.Count), FetchQuestData().Chars[char], slice, done)
 	return render(c, component)
 }
 
@@ -61,17 +62,22 @@ func postHomeHandler(c echo.Context) error {
 	if c.FormValue("total") != "" {
 		total.Count++
 	}
-	if end < len(FetchQuestData().Animes) {
+	if end < len(FetchQuestData().Animes) && start != len(FetchQuestData().Animes) {
 		start += 4
 		end += 4
 		char++
+		done--
 	}
-	if end > len(FetchQuestData().Animes) {
+	fmt.Println(" ")
+	fmt.Println(done)
+	fmt.Println(" ")
+	if end >= len(FetchQuestData().Animes) {
 		// stop and show final resual
 		start = 0
 		end = 4
 		char = 0
-		c.Response().Header().Set("HX-Redirect", "/count")
+		// c.Response().Header().Set("HX-Redirec", "/")
+		c.Response().Header().Set("HX-Refresh", "true")
 		return c.NoContent(http.StatusNoContent)
 
 	}
