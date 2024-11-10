@@ -25,7 +25,4 @@ func FetchQuestData() Quest {
 			"Demon Slayer", "Tokyo Ghoul", "Bleach", "Dragon Ball Z",
 		},
 	}
-	// "One Piece",/// "Black Clover",/ "Fullmetal Alchemist"//"Sword Art Online",// "Tokyo Ghoul",, // "One Piece", "Naruto",
-	//"Black Clover",// "Naruto",
-	//"Bleach",	// "Fairy Tail",
 }
