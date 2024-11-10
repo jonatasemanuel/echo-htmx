@@ -1,0 +1,10 @@
+package views
+
+templ FinalScore(total string) {
+@Layout("Score") {
+<div id="finalScore" action="/final-score" method="GET" hx-post="/final-score" hx-select="#finalSCore"
+	hx-swap="outerHTML">
+	<h1>Congrats you have { total }</h1>
+</div>
+}
+}

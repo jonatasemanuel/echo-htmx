@@ -21,7 +21,7 @@ func FetchQuestData() Quest {
 			"Sword Art Online", "Demon Slayer", "My Hero Academia", "Naruto", //"Bleach",
 			"Dragon Ball Z", "Tokyo Ghoul", "One Punch Man", "Naruto", //"Black Clover",
 			"Fairy Tail", "Death Note", "Naruto", "Hunter x Hunter", // "One Piece",
-			"Attack on Titan", "Naruto", "My Hero Academia", // "Sword Art Online",
+			"Attack on Titan", "Naruto", "My Hero Academia", "Sword Art Online",
 			"Demon Slayer", "Tokyo Ghoul", "Bleach", "Dragon Ball Z", // "Naruto",
 		},
 	}

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -27,7 +26,7 @@ type Quest struct {
 var (
 	char  int = 0
 	start int = 0
-	end   int = 4
+	end   int = 3
 	done  int = 15
 )
 var global GlobalState
@@ -51,9 +50,15 @@ func postHandler(c echo.Context) error {
 	return getHandler(c)
 }
 
+func finalScore(c echo.Context) error {
+	component := views.FinalScore(strconv.Itoa(total.Count))
+	return render(c, component)
+}
+
 func getHome(c echo.Context) error {
 	// get from some repo(api) or create a api(pkg) fetching by another
-	slice := FetchQuestData().Animes[start:end]
+	// need transforme in a map
+	slice := FetchQuestData().Animes[start : end+1]
 	component := views.Home(strconv.Itoa(total.Count), FetchQuestData().Chars[char], slice, done)
 	return render(c, component)
 }
@@ -62,24 +67,19 @@ func postHomeHandler(c echo.Context) error {
 	if c.FormValue("total") != "" {
 		total.Count++
 	}
-	if end < len(FetchQuestData().Animes) && start != len(FetchQuestData().Animes) {
+
+	if end < len(FetchQuestData().Animes) {
 		start += 4
 		end += 4
 		char++
 		done--
 	}
-	fmt.Println(" ")
-	fmt.Println(done)
-	fmt.Println(" ")
-	if end >= len(FetchQuestData().Animes) {
-		// stop and show final resual
+	if end > len(FetchQuestData().Animes) {
 		start = 0
 		end = 4
 		char = 0
-		// c.Response().Header().Set("HX-Redirec", "/")
-		c.Response().Header().Set("HX-Refresh", "true")
+		c.Response().Header().Set("HX-Redirect", "/final-score")
 		return c.NoContent(http.StatusNoContent)
-
 	}
 	return getHome(c)
 }
@@ -96,6 +96,7 @@ func main() {
 	sessionManager.Lifetime = 24 * time.Hour
 	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
 
+	e.GET("/final-score", finalScore)
 	e.GET("/", getHome)
 	e.POST("/", postHomeHandler)
 
