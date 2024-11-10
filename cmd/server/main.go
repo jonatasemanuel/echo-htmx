@@ -57,7 +57,7 @@ func finalScore(c echo.Context) error {
 
 func getHome(c echo.Context) error {
 	// get from some repo(api) or create a api(pkg) fetching by another
-	// need transforme in a map
+	// need turn into a map
 	slice := FetchQuestData().Animes[start : end+1]
 	component := views.Home(strconv.Itoa(total.Count), FetchQuestData().Chars[char], slice, done)
 	return render(c, component)
