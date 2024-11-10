@@ -1,7 +1,48 @@
 package views
 
-templ Home(title string) {
-@Layout(title) {
-<h1>Welcome back!</h1>
+import "sort"
+
+var sorted []string
+
+templ Home(total, char string, animes []string, done int) {
+@Layout("guesswho") {
+if done > 0 {
+@Quest(total, char, animes)
+} else {
+@FinalScore(total)
 }
+}
+}
+
+templ Quest(total, char string, animes []string) {
+<form id="totalCount" action="/" method="POST" hx-post="/" hx-select="#totalCount" hx-swap="outerHTML">
+	<div>
+		{{ res := animes[0] }}
+		{{ sorted := animes[:] }}
+		{{ sort.Strings(sorted) }}
+		@Score(total)
+		<div>
+			<h1>{ char } </h1>
+		</div>
+		<ul>
+			for _, anime := range sorted {
+			if anime == res {
+			<button class="button is-primary" type="submit" name="total" value="total">
+				{ anime }
+			</button>
+			} else {
+			<button class="button is-primary" type="submit">
+				{ anime }
+			</button>
+			}
+			}
+		</ul>
+	</div>
+</form>
+}
+
+templ Score(total string) {
+<div>
+	<h2>Score:{ total } </h2>
+</div>
 }
