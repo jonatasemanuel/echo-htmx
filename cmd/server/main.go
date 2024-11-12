@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"sort"
 	"strconv"
@@ -33,7 +34,7 @@ var (
 	slice []string
 	char  int = 0
 	start int = 0
-	end   int = 3
+	end   int = 4
 	done  int = 15
 )
 var global GlobalState
@@ -64,26 +65,20 @@ func finalScore(c echo.Context) error {
 
 func getHome(c echo.Context) error {
 	charData := FetchData().Char[char]
+	animeName := charData["anime"]
+	animeList := FetchData().AnimeList[start:end]
 
-	slice = []string{charData["anime"]}
-	animeList := FetchData().AnimeList
-	for _, anime := range animeList {
-		if len(slice) >= 4 {
-			break
-		}
-		if anime != charData["anime"] && !contains(slice, anime) {
-			slice = append(slice, anime)
-		}
-
+	slice := []string{}
+	slice = append(slice, animeList...)
+	if !contains(slice, animeName) {
+		slice[0] = animeName
 	}
-
 	sort.Strings(slice)
 
 	component := views.Home(strconv.Itoa(total.Count), charData, slice, done)
 	return render(c, component)
 }
 
-// Helper function to check if a slice contains a specific item.
 func contains(slice []string, item string) bool {
 	for _, v := range slice {
 		if v == item {
@@ -98,9 +93,22 @@ func postHomeHandler(c echo.Context) error {
 		total.Count++
 	}
 
-	if done > 0 {
+	fmt.Println("")
+	fmt.Println(end)
+	fmt.Println("")
+	animesQtd := len(FetchData().AnimeList)
+	if end < animesQtd {
+		start += 4
+		end += 4
 		char++
 		done--
+	}
+	fmt.Println("")
+	fmt.Println(end)
+	fmt.Println("")
+	if end > animesQtd {
+		start = 0
+		end = 4
 	}
 	if done == 0 {
 		char = 0
