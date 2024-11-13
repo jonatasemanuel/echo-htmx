@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/alexedwards/scs/v2"
+	"github.com/jonatasemanuel/echo-htmx/internal/database"
 	views "github.com/jonatasemanuel/echo-htmx/internal/views/public"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -123,6 +125,9 @@ func render(ctx echo.Context, cmp templ.Component) error {
 }
 
 func main() {
+	if err := database.Run(); err != nil {
+		log.Fatal(err)
+	}
 	e := echo.New()
 	sessionManager = scs.New()
 	e.Use(middleware.Logger())

@@ -6,6 +6,7 @@ require (
 	github.com/a-h/templ v0.2.793
 	github.com/alexedwards/scs/v2 v2.8.0
 	github.com/labstack/echo/v4 v4.12.0
+	github.com/mattn/go-sqlite3 v1.14.24
 )
 
 require (
