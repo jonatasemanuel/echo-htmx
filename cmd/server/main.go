@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -23,10 +25,16 @@ type Quest struct {
 	Animes []string
 }
 
+type Data struct {
+	Char      []map[string]string
+	AnimeList []string
+}
+
 var (
+	slice []string
 	char  int = 0
 	start int = 0
-	end   int = 3
+	end   int = 4
 	done  int = 15
 )
 var global GlobalState
@@ -56,11 +64,28 @@ func finalScore(c echo.Context) error {
 }
 
 func getHome(c echo.Context) error {
-	// get from some repo(api) or create a api(pkg) fetching by another
-	// need turn into a map
-	slice := FetchQuestData().Animes[start : end+1]
-	component := views.Home(strconv.Itoa(total.Count), FetchQuestData().Chars[char], slice, done)
+	charData := FetchData().Char[char]
+	animeName := charData["anime"]
+	animeList := FetchData().AnimeList[start:end]
+
+	slice := []string{}
+	slice = append(slice, animeList...)
+	if !contains(slice, animeName) {
+		slice[0] = animeName
+	}
+	sort.Strings(slice)
+
+	component := views.Home(strconv.Itoa(total.Count), charData, slice, done)
 	return render(c, component)
+}
+
+func contains(slice []string, item string) bool {
+	for _, v := range slice {
+		if v == item {
+			return true
+		}
+	}
+	return false
 }
 
 func postHomeHandler(c echo.Context) error {
@@ -68,15 +93,24 @@ func postHomeHandler(c echo.Context) error {
 		total.Count++
 	}
 
-	if end < len(FetchQuestData().Animes) {
+	fmt.Println("")
+	fmt.Println(end)
+	fmt.Println("")
+	animesQtd := len(FetchData().AnimeList)
+	if end < animesQtd {
 		start += 4
 		end += 4
 		char++
 		done--
 	}
-	if end > len(FetchQuestData().Animes) {
+	fmt.Println("")
+	fmt.Println(end)
+	fmt.Println("")
+	if end > animesQtd {
 		start = 0
 		end = 4
+	}
+	if done == 0 {
 		char = 0
 		c.Response().Header().Set("HX-Redirect", "/final-score")
 		return c.NoContent(http.StatusNoContent)
