@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -26,7 +24,6 @@ type Quest struct {
 	Chars  []string
 	Animes []string
 }
-
 type Data struct {
 	Char      []map[string]string
 	AnimeList []string
@@ -95,9 +92,6 @@ func postHomeHandler(c echo.Context) error {
 		total.Count++
 	}
 
-	fmt.Println("")
-	fmt.Println(end)
-	fmt.Println("")
 	animesQtd := len(FetchData().AnimeList)
 	if end < animesQtd {
 		start += 4
@@ -105,9 +99,6 @@ func postHomeHandler(c echo.Context) error {
 		char++
 		done--
 	}
-	fmt.Println("")
-	fmt.Println(end)
-	fmt.Println("")
 	if end > animesQtd {
 		start = 0
 		end = 4
@@ -125,15 +116,33 @@ func render(ctx echo.Context, cmp templ.Component) error {
 }
 
 func main() {
-	if err := database.Run(); err != nil {
-		log.Fatal(err)
-	}
+	database := database.NewDB("./anime.db")
+	defer database.Close()
+
 	e := echo.New()
 	sessionManager = scs.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	sessionManager.Lifetime = 24 * time.Hour
 	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
+
+	e.POST("/anime", func(c echo.Context) error {
+		type Request struct {
+			Name string `json:"name"`
+		}
+		req := new(Request)
+		if err := c.Bind(req); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
+		}
+
+		anime, err := database.CreateAnime(req.Name)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+
+		return c.JSON(http.StatusCreated, anime)
+
+	})
 
 	e.GET("/final-score", finalScore)
 	e.GET("/", getHome)
