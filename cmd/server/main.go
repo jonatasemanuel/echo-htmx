@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -9,6 +11,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/alexedwards/scs/v2"
 	"github.com/jonatasemanuel/echo-htmx/internal/database"
+	"github.com/jonatasemanuel/echo-htmx/internal/models"
 	views "github.com/jonatasemanuel/echo-htmx/internal/views/public"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -39,6 +42,7 @@ var (
 var global GlobalState
 var total ScoreState
 var sessionManager *scs.SessionManager
+var anime models.Anime
 
 func getHandler(c echo.Context) error {
 	userCount := sessionManager.GetInt(c.Request().Context(), "count")
@@ -116,9 +120,11 @@ func render(ctx echo.Context, cmp templ.Component) error {
 }
 
 func main() {
-	database := database.NewDB("./anime.db")
-	defer database.Close()
-
+	dbConn, err := database.ConnectDB("./anime.db")
+	if err != nil {
+		log.Fatal("Cannot connect to database")
+	}
+	defer dbConn.DB.Close()
 	e := echo.New()
 	sessionManager = scs.New()
 	e.Use(middleware.Logger())
@@ -127,21 +133,20 @@ func main() {
 	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
 
 	e.POST("/anime", func(c echo.Context) error {
-		type Request struct {
-			Name string `json:"name"`
-		}
-		req := new(Request)
-		if err := c.Bind(req); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]string{"error": "invalid request"})
-		}
-
-		anime, err := database.CreateAnime(req.Name)
+		var anime models.Anime
+		err := json.NewDecoder(c.Request().Body).Decode(&anime)
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+			log.Fatal("error to create")
 		}
-
-		return c.JSON(http.StatusCreated, anime)
-
+		return c.JSON(http.StatusOK, anime)
+	})
+	e.GET("/anime", func(c echo.Context) error {
+		all, err := anime.ListAnimes()
+		if err != nil {
+			log.Fatal("error to create")
+		}
+		res := map[string]interface{}{"name": all}
+		return c.JSON(http.StatusOK, res)
 	})
 
 	e.GET("/final-score", finalScore)
