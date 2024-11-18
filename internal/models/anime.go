@@ -2,19 +2,21 @@ package models
 
 import (
 	"context"
-	"fmt"
 )
 
 type Anime struct {
-	ID   int    `db:"id" json:"id"`
-	Name string `db:"name" json:"name"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 func (a *Anime) CreateAnime(anime Anime) (*Anime, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `INSERT INTO anime (anime) VALUES (?) RETURNING id,name`
+	query := `INSERT INTO animes (name)
+		VALUES($1) RETURNING name
+	`
+	// erro
 	_, err := db.ExecContext(
 		ctx,
 		query,
@@ -33,13 +35,13 @@ func (a *Anime) ListAnimes() ([]*Anime, error) {
 	defer cancel()
 
 	query := `SELECT
-		id,
-		name FROM anime`
+		* FROM animes`
+	// erro
 	rows, err := db.QueryContext(ctx, query)
-
 	if err != nil {
 		return nil, err
 	}
+
 	var animes []*Anime
 	for rows.Next() {
 		var anime Anime
@@ -52,6 +54,6 @@ func (a *Anime) ListAnimes() ([]*Anime, error) {
 		}
 		animes = append(animes, &anime)
 	}
-	fmt.Println(animes)
+
 	return animes, nil
 }

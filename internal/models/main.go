@@ -7,7 +7,7 @@ import (
 
 var db *sql.DB
 
-const dbTimeout = time.Second * 3
+const dbTimeout = time.Second * 5
 
 type Models struct {
 	Anime Anime

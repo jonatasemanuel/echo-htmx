@@ -27,6 +27,7 @@ type Quest struct {
 	Chars  []string
 	Animes []string
 }
+
 type Data struct {
 	Char      []map[string]string
 	AnimeList []string
@@ -133,17 +134,24 @@ func main() {
 	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
 
 	e.POST("/anime", func(c echo.Context) error {
-		var anime models.Anime
+		var animeData models.Anime
+
 		err := json.NewDecoder(c.Request().Body).Decode(&anime)
 		if err != nil {
-			log.Fatal("error to create")
+			log.Print("error to create")
 		}
-		return c.JSON(http.StatusOK, anime)
+
+		animeCreated, err := anime.CreateAnime(animeData)
+		if err != nil {
+			log.Print("error to save")
+		}
+
+		return c.JSON(http.StatusOK, animeCreated)
 	})
 	e.GET("/anime", func(c echo.Context) error {
 		all, err := anime.ListAnimes()
 		if err != nil {
-			log.Fatal("error to create")
+			log.Fatal(err)
 		}
 		res := map[string]interface{}{"name": all}
 		return c.JSON(http.StatusOK, res)
@@ -156,6 +164,9 @@ func main() {
 	// --counter
 	e.GET("/count", getHandler)
 	e.POST("/count", postHandler)
+
+	models.New(dbConn.DB)
+
 	e.Logger.Fatal(e.Start(":8080"))
 
 }

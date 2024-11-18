@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"time"
 
-	_ "github.com/jmoiron/sqlx"
+	// "github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -15,21 +16,24 @@ type DB struct {
 
 var dbConn = &DB{}
 
+const maxOpenDbConn = 10
+const maxIdleDbConn = 5
+const maxDbLifetime = 5 * time.Minute
+
 func ConnectDB(dns string) (*DB, error) {
 	conn, err := sql.Open("sqlite3", dns)
 	if err != nil {
 		log.Fatal("Failed to connect to database: %v", err)
 	}
+	conn.SetMaxOpenConns(maxIdleDbConn)
+	conn.SetMaxIdleConns(maxIdleDbConn)
+	conn.SetConnMaxLifetime(maxDbLifetime)
 
 	err = testDB(conn)
 	if err != nil {
 		return nil, err
 	}
-	// schema := `
-	// 	CREATE TABLE IF NOT EXISTS anime (
-	// 		id INTEGER PRIMARY KEY AUTOINCREMENT,
-	// 		name TEXT NOT NULL UNIQUE
-	// );`
+
 	dbConn.DB = conn
 	return dbConn, nil
 }
