@@ -136,7 +136,7 @@ func main() {
 	e.POST("/anime", func(c echo.Context) error {
 		var animeData models.Anime
 
-		err := json.NewDecoder(c.Request().Body).Decode(&anime)
+		err := json.NewDecoder(c.Request().Body).Decode(&animeData)
 		if err != nil {
 			log.Print("error to create")
 		}
