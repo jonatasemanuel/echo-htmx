@@ -23,7 +23,7 @@ const (
 func FetchData() Data {
 	return Data{
 		Char: []map[string]string{
-			{"name": "Ace", "anime": OnePiece, "image": "ace.jpg"},
+			{"name": "Ace", "anime": OnePiece, "image": "https://i.ibb.co/ZXchsTH/image.png"},
 			{"name": "Magna", "anime": BlackClover, "image": "magna.jpg"},
 			{"name": "Gin", "anime": HunterXHunter, "image": "gin.jpg"},
 			{"name": "Killer Bee", "anime": Naruto, "image": "killer-bee.jpg"},
