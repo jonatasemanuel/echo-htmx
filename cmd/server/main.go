@@ -8,9 +8,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/a-h/templ"
 	"github.com/alexedwards/scs/v2"
 	"github.com/jonatasemanuel/echo-htmx/internal/database"
+	"github.com/jonatasemanuel/echo-htmx/internal/handlers"
 	"github.com/jonatasemanuel/echo-htmx/internal/models"
 	views "github.com/jonatasemanuel/echo-htmx/internal/views/public"
 	"github.com/labstack/echo/v4"
@@ -20,9 +20,7 @@ import (
 type ScoreState struct {
 	Count int
 }
-type GlobalState struct {
-	Count int
-}
+
 type Quest struct {
 	Chars  []string
 	Animes []string
@@ -40,31 +38,13 @@ var (
 	end   int = 4
 	done  int = 15
 )
-var global GlobalState
+
 var total ScoreState
-var sessionManager *scs.SessionManager
 var anime models.Anime
-
-func getHandler(c echo.Context) error {
-	userCount := sessionManager.GetInt(c.Request().Context(), "count")
-	component := views.Page(global.Count, userCount)
-	return render(c, component)
-}
-
-func postHandler(c echo.Context) error {
-	if c.FormValue("global") != "" {
-		global.Count++
-	}
-	if c.FormValue("session") != "" {
-		currentCount := sessionManager.GetInt(c.Request().Context(), "count")
-		sessionManager.Put(c.Request().Context(), "count", currentCount+1)
-	}
-	return getHandler(c)
-}
 
 func finalScore(c echo.Context) error {
 	component := views.FinalScore(strconv.Itoa(total.Count))
-	return render(c, component)
+	return handlers.Render(c, component)
 }
 
 func getHome(c echo.Context) error {
@@ -74,22 +54,13 @@ func getHome(c echo.Context) error {
 
 	slice := []string{}
 	slice = append(slice, animeList...)
-	if !contains(slice, animeName) {
+	if !handlers.Contains(slice, animeName) {
 		slice[0] = animeName
 	}
 	sort.Strings(slice)
 
 	component := views.Home(strconv.Itoa(total.Count), charData, slice, done)
-	return render(c, component)
-}
-
-func contains(slice []string, item string) bool {
-	for _, v := range slice {
-		if v == item {
-			return true
-		}
-	}
-	return false
+	return handlers.Render(c, component)
 }
 
 func postHomeHandler(c echo.Context) error {
@@ -116,22 +87,21 @@ func postHomeHandler(c echo.Context) error {
 	return getHome(c)
 }
 
-func render(ctx echo.Context, cmp templ.Component) error {
-	return cmp.Render(ctx.Request().Context(), ctx.Response())
-}
-
 func main() {
+	// run() -> server start config
 	dbConn, err := database.ConnectDB("./anime.db")
 	if err != nil {
 		log.Fatal("Cannot connect to database")
 	}
 	defer dbConn.DB.Close()
 	e := echo.New()
-	sessionManager = scs.New()
+	handlers.SessionManager = scs.New()
+
+	// routes() -> call routes
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	sessionManager.Lifetime = 24 * time.Hour
-	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
+	handlers.SessionManager.Lifetime = 24 * time.Hour
+	e.Use(echo.WrapMiddleware(handlers.SessionManager.LoadAndSave))
 
 	e.POST("/anime", func(c echo.Context) error {
 		var animeData models.Anime
@@ -162,9 +132,10 @@ func main() {
 	e.POST("/", postHomeHandler)
 
 	// --counter
-	e.GET("/count", getHandler)
-	e.POST("/count", postHandler)
+	e.GET("/count", handlers.GetHandler)
+	e.POST("/count", handlers.PostHandler)
 
+	// configs()
 	models.New(dbConn.DB)
 
 	e.Logger.Fatal(e.Start(":8080"))
