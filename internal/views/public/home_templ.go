@@ -100,20 +100,20 @@ func Quest(total string, charData map[string]string, animes []string) templ.Comp
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(charData["image"])
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 21, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 21, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" border=\"0\"></div><h1>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" style=\"max-width: 200px\" border=\"0\"></div><h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(charData["name"])
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 23, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 23, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -132,7 +132,7 @@ func Quest(total string, charData map[string]string, animes []string) templ.Comp
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(anime)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 35, Col: 14}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 30, Col: 11}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -150,7 +150,7 @@ func Quest(total string, charData map[string]string, animes []string) templ.Comp
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(anime)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 39, Col: 14}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 34, Col: 11}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -198,7 +198,7 @@ func Score(total string) templ.Component {
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(total)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 50, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/views/public/home.templ`, Line: 45, Col: 18}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {

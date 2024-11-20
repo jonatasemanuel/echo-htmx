@@ -3,50 +3,45 @@ package views
 var sorted []string
 
 templ Home(total string, charData map[string]string, animes []string, done int) {
-	@Layout("guesswho") {
-		if done > 0 {
-			@Quest(total, charData, animes)
-		} else {
-			@FinalScore(total)
-		}
-	}
+@Layout("guesswho") {
+if done > 0 {
+@Quest(total, charData, animes)
+} else {
+@FinalScore(total)
+}
+}
 }
 
 templ Quest(total string, charData map[string]string, animes []string) {
-	<form id="totalCount" action="/" method="POST" hx-post="/" hx-select="#totalCount" hx-swap="outerHTML">
+<form id="totalCount" action="/" method="POST" hx-post="/" hx-select="#totalCount" hx-swap="outerHTML">
+	<div>
+		@Score(total)
 		<div>
-			@Score(total)
 			<div>
-				<div>
-					<img src={ charData["image"] } border="0"/>
-				</div>
-				<h1>{ charData["name"] } </h1>
+				<img src={ charData["image"] } style="max-width: 200px" border="0" />
 			</div>
-			<ul>
-				for _, anime := range animes {
-					if anime == charData["anime"] {
-						<button
-							style="padding: .5rem; font-size: 1.2rem;"
-							class="button is-primary"
-							type="submit"
-							name="total"
-							value="total"
-						>
-							{ anime }
-						</button>
-					} else {
-						<button style="padding: .5rem; font-size: 1.2rem;" class="button is-primary" type="submit">
-							{ anime }
-						</button>
-					}
-				}
-			</ul>
+			<h1>{ charData["name"] } </h1>
 		</div>
-	</form>
+		<ul>
+			for _, anime := range animes {
+			if anime == charData["anime"] {
+			<button style="padding: .5rem; font-size: 1.2rem;" class="button is-primary" type="submit"
+				name="total" value="total">
+				{ anime }
+			</button>
+			} else {
+			<button style="padding: .5rem; font-size: 1.2rem;" class="button is-primary" type="submit">
+				{ anime }
+			</button>
+			}
+			}
+		</ul>
+	</div>
+</form>
 }
 
 templ Score(total string) {
-	<div>
-		<h2>Score:{ total } </h2>
-	</div>
+<div>
+	<h2>Score:{ total } </h2>
+</div>
 }

@@ -97,7 +97,7 @@ func postHomeHandler(c echo.Context) error {
 		total.Count++
 	}
 
-	animesQtd := len(FetchData().AnimeList)
+	animesQtd := len(FetchData().AnimeList) - 1
 	if end < animesQtd {
 		start += 4
 		end += 4
