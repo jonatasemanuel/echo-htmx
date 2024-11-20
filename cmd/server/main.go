@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
 	"net/http"
 	"sort"
 	"strconv"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/alexedwards/scs/v2"
+	"github.com/jonatasemanuel/echo-htmx/internal/database"
+	"github.com/jonatasemanuel/echo-htmx/internal/models"
 	views "github.com/jonatasemanuel/echo-htmx/internal/views/public"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -40,6 +43,7 @@ var (
 var global GlobalState
 var total ScoreState
 var sessionManager *scs.SessionManager
+var anime models.Anime
 
 func getHandler(c echo.Context) error {
 	userCount := sessionManager.GetInt(c.Request().Context(), "count")
@@ -93,19 +97,13 @@ func postHomeHandler(c echo.Context) error {
 		total.Count++
 	}
 
-	fmt.Println("")
-	fmt.Println(end)
-	fmt.Println("")
-	animesQtd := len(FetchData().AnimeList)
+	animesQtd := len(FetchData().AnimeList) - 1
 	if end < animesQtd {
 		start += 4
 		end += 4
 		char++
 		done--
 	}
-	fmt.Println("")
-	fmt.Println(end)
-	fmt.Println("")
 	if end > animesQtd {
 		start = 0
 		end = 4
@@ -123,12 +121,41 @@ func render(ctx echo.Context, cmp templ.Component) error {
 }
 
 func main() {
+	dbConn, err := database.ConnectDB("./anime.db")
+	if err != nil {
+		log.Fatal("Cannot connect to database")
+	}
+	defer dbConn.DB.Close()
 	e := echo.New()
 	sessionManager = scs.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	sessionManager.Lifetime = 24 * time.Hour
 	e.Use(echo.WrapMiddleware(sessionManager.LoadAndSave))
+
+	e.POST("/anime", func(c echo.Context) error {
+		var animeData models.Anime
+
+		err := json.NewDecoder(c.Request().Body).Decode(&animeData)
+		if err != nil {
+			log.Print("error to create")
+		}
+
+		animeCreated, err := anime.CreateAnime(animeData)
+		if err != nil {
+			log.Print("error to save")
+		}
+
+		return c.JSON(http.StatusOK, animeCreated)
+	})
+	e.GET("/anime", func(c echo.Context) error {
+		all, err := anime.ListAnimes()
+		if err != nil {
+			log.Fatal(err)
+		}
+		res := map[string]interface{}{"name": all}
+		return c.JSON(http.StatusOK, res)
+	})
 
 	e.GET("/final-score", finalScore)
 	e.GET("/", getHome)
@@ -137,6 +164,9 @@ func main() {
 	// --counter
 	e.GET("/count", getHandler)
 	e.POST("/count", postHandler)
+
+	models.New(dbConn.DB)
+
 	e.Logger.Fatal(e.Start(":8080"))
 
 }

@@ -17,16 +17,20 @@ templ Quest(total string, charData map[string]string, animes []string) {
 	<div>
 		@Score(total)
 		<div>
+			<div>
+				<img src={ charData["image"] } style="max-width: 200px" border="0" />
+			</div>
 			<h1>{ charData["name"] } </h1>
 		</div>
 		<ul>
 			for _, anime := range animes {
 			if anime == charData["anime"] {
-			<button class="button is-primary" type="submit" name="total" value="total">
+			<button style="padding: .5rem; font-size: 1.2rem;" class="button is-primary" type="submit"
+				name="total" value="total">
 				{ anime }
 			</button>
 			} else {
-			<button class="button is-primary" type="submit">
+			<button style="padding: .5rem; font-size: 1.2rem;" class="button is-primary" type="submit">
 				{ anime }
 			</button>
 			}

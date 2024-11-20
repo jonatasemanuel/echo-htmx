@@ -1,0 +1,13 @@
+-- Add up migration script here
+CREATE TABLE IF NOT EXISTS animes(
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name text NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS characters (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	name text NOT NULL UNIQUE,
+	anime_id INTEGER,
+	image text,
+	FOREIGN KEY(anime_id) REFERENCES animes(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
