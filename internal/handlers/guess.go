@@ -36,12 +36,12 @@ var (
 var total ScoreState
 var anime models.Anime
 
-func finalScore(c echo.Context) error {
+func FinalScore(c echo.Context) error {
 	component := views.FinalScore(strconv.Itoa(total.Count))
 	return Render(c, component)
 }
 
-func getHome(c echo.Context) error {
+func GetHome(c echo.Context) error {
 	charData := cmd.FetchData().Char[char]
 	animeName := charData["anime"]
 	animeList := cmd.FetchData().AnimeList[start:end]
@@ -57,7 +57,7 @@ func getHome(c echo.Context) error {
 	return Render(c, component)
 }
 
-func postHomeHandler(c echo.Context) error {
+func PostHomeHandler(c echo.Context) error {
 	if c.FormValue("total") != "" {
 		total.Count++
 	}
@@ -78,5 +78,5 @@ func postHomeHandler(c echo.Context) error {
 		c.Response().Header().Set("HX-Redirect", "/final-score")
 		return c.NoContent(http.StatusNoContent)
 	}
-	return getHome(c)
+	return GetHome(c)
 }
