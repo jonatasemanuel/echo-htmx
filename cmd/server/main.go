@@ -42,7 +42,7 @@ func main() {
 	e.GET("/count", handlers.GetHandler)
 	e.POST("/count", handlers.PostHandler)
 
-	// configs()
+	// configs() struct
 	models.New(dbConn.DB)
 
 	e.Logger.Fatal(e.Start(":8080"))

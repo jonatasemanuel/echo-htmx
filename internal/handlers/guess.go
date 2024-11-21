@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"log"
+	"math/rand"
 	"net/http"
-	"sort"
 	"strconv"
 
-	"github.com/jonatasemanuel/echo-htmx/cmd"
 	"github.com/jonatasemanuel/echo-htmx/internal/models"
 	views "github.com/jonatasemanuel/echo-htmx/internal/views/public"
 	"github.com/labstack/echo/v4"
@@ -15,18 +15,7 @@ type ScoreState struct {
 	Count int
 }
 
-type Quest struct {
-	Chars  []string
-	Animes []string
-}
-
-type Data struct {
-	Char      []map[string]string
-	AnimeList []string
-}
-
 var (
-	slice []string
 	char  int = 0
 	start int = 0
 	end   int = 4
@@ -34,7 +23,9 @@ var (
 )
 
 var total ScoreState
+
 var anime models.Anime
+var character models.Character
 
 func FinalScore(c echo.Context) error {
 	component := views.FinalScore(strconv.Itoa(total.Count))
@@ -42,16 +33,42 @@ func FinalScore(c echo.Context) error {
 }
 
 func GetHome(c echo.Context) error {
-	charData := cmd.FetchData().Char[char]
-	animeName := charData["anime"]
-	animeList := cmd.FetchData().AnimeList[start:end]
-
-	slice := []string{}
-	slice = append(slice, animeList...)
-	if !Contains(slice, animeName) {
-		slice[0] = animeName
+	charData, err := character.GetCharByID(char)
+	for err != nil {
+		char++
+		charData, err = character.GetCharByID(char)
 	}
-	sort.Strings(slice)
+
+	allAnimes, err := anime.ListAnimes()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var animeName string
+	animeList := make([]map[string]interface{}, 0)
+	for _, anime := range allAnimes {
+		animeList = append(animeList, map[string]interface{}{
+			"ID":   anime.ID,
+			"Name": anime.Name,
+		})
+		if anime.ID == charData.Anime {
+			animeName = anime.Name
+		}
+
+	}
+
+	slice := make([]map[string]interface{}, 0)
+	for _, anime := range animeList[start:end] {
+		slice = append(slice, anime)
+	}
+
+	if !Contains(slice, charData.Anime) {
+		// rand number 1?-4 to index result
+		slice[rand.Intn(4)] = map[string]interface{}{
+			"ID":   charData.Anime,
+			"Name": animeName,
+		}
+	}
 
 	component := views.Home(strconv.Itoa(total.Count), charData, slice, done)
 	return Render(c, component)
@@ -62,7 +79,12 @@ func PostHomeHandler(c echo.Context) error {
 		total.Count++
 	}
 
-	animesQtd := len(cmd.FetchData().AnimeList) - 1
+	allAnimes, err := anime.ListAnimes()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	animesQtd := len(allAnimes) - 1
 	if end < animesQtd {
 		start += 4
 		end += 4

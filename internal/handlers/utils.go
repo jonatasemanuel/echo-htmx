@@ -5,9 +5,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Contains(slice []string, item string) bool {
-	for _, v := range slice {
-		if v == item {
+func Contains(slice []map[string]interface{}, animeID int) bool {
+	for _, item := range slice {
+		if id, ok := item["ID"].(int); ok && id == animeID {
 			return true
 		}
 	}
