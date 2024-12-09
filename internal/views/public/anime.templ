@@ -1,0 +1,13 @@
+package views
+
+templ Anime(animes []map[string]interface{}) {
+	@Layout("Animes") {
+		<div>
+			<ul>
+				for _, anime := range animes {
+					<li>{ anime["Name"].(string) }</li>
+				}
+			</ul>
+		</div>
+	}
+}
